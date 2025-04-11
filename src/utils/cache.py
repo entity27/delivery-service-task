@@ -24,7 +24,7 @@ class RedisCache(ABC):
         Инициализируем соединение с редисом
         """
         self._con = redis
-        self._prefix = settings.project_name
+        self._prefix = settings.PROJECT_NAME
 
     @property
     @abstractmethod

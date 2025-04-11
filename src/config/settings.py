@@ -23,6 +23,8 @@ class Config(BaseSettings):
     # Общие переменные проекта
     DEBUG: bool
     SECRET_KEY: str
+    HOST_URL: HttpUrl
+    PROJECT_NAME: str = 'delivery-service-task'
 
     # База данных
     DB_HOST: str
@@ -44,13 +46,6 @@ class Config(BaseSettings):
     RABBIT_USER: _StrNullable = None
     RABBIT_PASSWORD: _StrNullable = None
     RABBIT_VHOST: _StrNullable = None
-
-    # URL проекта
-    HOST_URL: HttpUrl
-
-    @property
-    def project_name(self) -> str:
-        return BASE_DIR.name
 
     @property
     def sqlalchemy_async_url(self) -> str:
