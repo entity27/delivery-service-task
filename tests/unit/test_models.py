@@ -1,5 +1,4 @@
 from decimal import Decimal
-from secrets import token_urlsafe
 
 import pytest
 from sqlalchemy import func, select
@@ -8,11 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.packages.models import Package, PackageType
 from src.sessions.models import Session
+from src.sessions.utils.session import generate_session_token
 
 
 @pytest.fixture(scope='module')
 def _token() -> str:
-    return token_urlsafe(32)
+    return generate_session_token()
 
 
 @pytest.mark.asyncio(loop_scope='session')
