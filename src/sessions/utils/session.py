@@ -2,4 +2,8 @@ from secrets import token_urlsafe
 
 
 def generate_session_token() -> str:
-    return token_urlsafe(32)
+    """
+    Генерирует токен сессии
+    """
+    # 'nbytes' используется только здесь, так что выносить в constraint'ы необязательно
+    return token_urlsafe(nbytes=32)

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.packages.constraints.package import COST, MAX_NAME, PRICE, WEIGHT
 from src.utils.models import IDModel
 
 if TYPE_CHECKING:
@@ -28,14 +29,16 @@ class Package(IDModel):
 
     __tablename__ = 'packages'
 
-    name: Mapped[str] = mapped_column(String(512), nullable=False)
+    name: Mapped[str] = mapped_column(String(MAX_NAME), nullable=False)
     weight: Mapped[Decimal] = mapped_column(
-        Numeric(precision=10, scale=2), nullable=False
+        Numeric(WEIGHT.precision, WEIGHT.scale), nullable=False
     )
     price: Mapped[Decimal] = mapped_column(
-        Numeric(precision=10, scale=2), nullable=False
+        Numeric(PRICE.precision, PRICE.scale), nullable=False
     )
-    cost: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=2), nullable=True)
+    cost: Mapped[Decimal] = mapped_column(
+        Numeric(COST.precision, COST.scale), nullable=True
+    )
     package_type_id: Mapped[int] = mapped_column(
         ForeignKey('package_types.id'), nullable=False
     )
