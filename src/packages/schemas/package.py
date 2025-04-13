@@ -50,5 +50,5 @@ class PackageOut(BaseModel):
     name: str
     weight: Decimal
     price: Decimal
-    cost: Decimal
+    cost: Decimal | None
     type: int = Field(validation_alias='package_type_id')

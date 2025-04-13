@@ -36,7 +36,7 @@ class Package(IDModel):
     price: Mapped[Decimal] = mapped_column(
         Numeric(PRICE.precision, PRICE.scale), nullable=False
     )
-    cost: Mapped[Decimal] = mapped_column(
+    cost: Mapped[Decimal | None] = mapped_column(
         Numeric(COST.precision, COST.scale), nullable=True
     )
     package_type_id: Mapped[int] = mapped_column(
