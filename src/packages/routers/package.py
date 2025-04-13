@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status
 
+from src.packages.exceptions.package import PackageTypeNotExistsError
 from src.packages.schemas.package import PackageIn
 from src.packages.schemas.package_status import PackageStatusUUIDOut
 from src.packages.services.package import PackageServiceDep
@@ -17,7 +18,12 @@ router = APIRouter(tags=['Посылки'])
     summary='Регистрация посылки',
     description='Производит отложенную регистрацию посылки, возвращает её статус. '
     'Регистрация будет производиться celery воркером через rabbitmq брокер',
-    responses=generate_custom_error_responses([SessionCookieRequiredError]),
+    responses=generate_custom_error_responses(
+        [
+            SessionCookieRequiredError,
+            PackageTypeNotExistsError,
+        ]
+    ),
 )
 async def package_create(
     package: PackageIn, session_token: SessionCookieDep, service: PackageServiceDep
