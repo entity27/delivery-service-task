@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Path, status
+from fastapi.params import Depends
 
 from src.packages.cache.package_status import PackageStatusDict
 from src.packages.exceptions.package import PackageTypeNotExistsError
@@ -10,15 +11,33 @@ from src.packages.exceptions.package_status import (
     PackageStatusNotFoundError,
 )
 from src.packages.models import Package
-from src.packages.schemas.package import PackageIn, PackageOut
+from src.packages.schemas.package import PackageFilterOptions, PackageIn, PackageOut
 from src.packages.schemas.package_status import PackageStatusOut, PackageStatusUUIDOut
 from src.packages.services.package import PackageServiceDep
 from src.sessions.dependencies.cookie import SessionCookieDep
 from src.sessions.dependencies.session import SessionDep
 from src.sessions.exceptions.cookie import SessionCookieRequiredError
 from src.utils.exceptions import Http404, generate_custom_error_responses
+from src.utils.pagination import PaginationIn, PaginationOut
 
 router = APIRouter(tags=['Посылки'])
+
+
+@router.get(
+    path='/',
+    response_model=PaginationOut[PackageOut],
+    status_code=status.HTTP_200_OK,
+    summary='Получение списка посылок',
+    description='Список посылок с пагинацией и фильтрацией',
+    responses=generate_custom_error_responses([Http404]),
+)
+async def package_list(
+    pagination: Annotated[PaginationIn, Depends()],
+    filters: Annotated[PackageFilterOptions, Depends()],
+    session: SessionDep,
+    service: PackageServiceDep,
+) -> PaginationOut[PackageOut]:
+    return await service.list_package(pagination, filters, session.id)
 
 
 @router.get(

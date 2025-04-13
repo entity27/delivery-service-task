@@ -30,6 +30,15 @@ class PackageIn(BaseModel):
     package_type_id: int = Field(alias='type', description='ID типа посылки', gt=0)
 
 
+class PackageFilterOptions(BaseModel):
+    """
+    Фильтры для списка посылок
+    """
+
+    package_type: int | None = Field(gt=0, default=None)
+    has_cost: bool | None = Field(default=None)
+
+
 class PackageOut(BaseModel):
     """
     Модель вывода информации о посылке

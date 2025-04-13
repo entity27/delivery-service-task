@@ -9,13 +9,14 @@ from src.packages.exceptions.package import PackageTypeNotExistsError
 from src.packages.models import Package
 from src.packages.repositories.package import PackageRepositoryDep
 from src.packages.repositories.package_type import PackageTypeRepositoryDep
-from src.packages.schemas.package import PackageIn
+from src.packages.schemas.package import PackageFilterOptions, PackageIn, PackageOut
 from src.packages.schemas.package_status import PackageStatusUUIDOut
 from src.sessions.models import Session
 from src.sessions.repositories.session import SessionRepositoryDep
 from src.utils.database import atomic
 from src.utils.dependencies import AsyncSessionDep
 from src.utils.exceptions import Http404
+from src.utils.pagination import PaginationIn, PaginationOut, paginate
 
 
 class PackageService:
@@ -32,6 +33,15 @@ class PackageService:
         self._repo = package_repo
         self._session_repo = session_repo
         self._type_rep = package_type_repo
+
+    async def list_package(
+        self, pagination: PaginationIn, filters: PackageFilterOptions, session_id: int
+    ) -> PaginationOut[PackageOut]:
+        stm = self._repo.list_query(session_id, filters.package_type, filters.has_cost)
+        items = await paginate(
+            stm, pagination, self._db_session, PackageOut, prefix='packages/'
+        )
+        return items
 
     async def get_package(self, package_id: int, session_id: int) -> Package:
         package = await self._repo.get(
