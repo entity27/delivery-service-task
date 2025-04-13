@@ -37,11 +37,11 @@ class PackageOut(BaseModel):
     Модель вывода информации о посылке
     """
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     weight: Decimal
     price: Decimal
     cost: Decimal
     package_type: int = Field(alias='package_type_id')
-
-    model_type = ConfigDict(from_attributes=True)
