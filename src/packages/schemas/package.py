@@ -27,9 +27,7 @@ class PackageIn(BaseModel):
         description='Стоимость содержимого посылки в долларах',
         gt=0,
     )
-    package_type_id: int = Field(
-        alias='package_type', description='ID типа посылки', gt=0
-    )
+    package_type_id: int = Field(alias='type', description='ID типа посылки', gt=0)
 
 
 class PackageOut(BaseModel):
@@ -44,4 +42,4 @@ class PackageOut(BaseModel):
     weight: Decimal
     price: Decimal
     cost: Decimal
-    package_type: int = Field(alias='package_type_id')
+    type: int = Field(validation_alias='package_type_id')
