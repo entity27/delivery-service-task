@@ -20,7 +20,7 @@ async def test_session(session_async: AsyncSession, _token: str) -> None:
     """
     Проверяем, что создание объектов работает
     """
-    first = Session()
+    first = Session(token=generate_session_token())
     second = Session(token=_token)
     third = Session(token=_token)
     session_async.add(first)
