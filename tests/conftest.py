@@ -8,10 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 from src.main import app
 from src.utils.dependencies import get_session_async
-from src.utils.helpers import autoimport_models
 from src.utils.sqlaclhemy import Base
-
-autoimport_models()
 
 
 def override_dependency(key: Callable[..., Any], value: Callable[..., Any]) -> None:
