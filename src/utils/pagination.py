@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Select, text
+from sqlalchemy import Select, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.settings import settings
@@ -16,7 +16,9 @@ class PaginationIn(BaseModel):
     """
 
     page: int = Field(default=1, ge=1, description='Номер страницы')
-    size: int = Field(default=20, ge=1, description='Количество элементов на странице')
+    size: int = Field(
+        default=20, ge=1, le=100, description='Количество элементов на странице'
+    )
 
 
 class PaginationOut(BaseModel, Generic[T]):
@@ -35,6 +37,7 @@ async def paginate(
     pagination: PaginationIn,
     db_session: AsyncSession,
     model: type[T],
+    prefix: str,
 ) -> PaginationOut[T]:
     """
     Выполняет пагинацию запроса списка репозитория
@@ -47,6 +50,7 @@ async def paginate(
         pagination: Настройки пагинации
         db_session: Сессия БД
         model: Pydantic модель, используемая в качестве элементов страницы
+        prefix: Префикс к пути запроса
     """
     offset = (pagination.page - 1) * pagination.size
     limit = pagination.size
@@ -63,9 +67,9 @@ async def paginate(
     previous_page = None
 
     if left:
-        next_page = _make_url(host, pagination.page + 1, pagination.size)
+        next_page = _make_url(host, pagination.page + 1, pagination.size, prefix)
     if pagination.page > 1:
-        previous_page = _make_url(host, pagination.page - 1, pagination.size)
+        previous_page = _make_url(host, pagination.page - 1, pagination.size, prefix)
 
     return PaginationOut(
         count=count, next=next_page, previous=previous_page, results=items
@@ -73,10 +77,12 @@ async def paginate(
 
 
 async def _count(statement: Select[Any], db_session: AsyncSession) -> int:
-    result = await db_session.execute(statement)
+    subquery = statement.subquery()
+    count_statement = select(func.count()).select_from(subquery)
+    result = await db_session.execute(count_statement)
     count = result.scalar_one_or_none()
     return count or 0
 
 
-def _make_url(host: str, page: int, size: int) -> str:
-    return f'{host}?page={page}&size={size}'
+def _make_url(host: str, page: int, size: int, prefix: str) -> str:
+    return f'{host}{prefix}?page={page}&size={size}'
