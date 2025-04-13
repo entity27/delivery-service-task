@@ -32,11 +32,10 @@ def register_package(data: dict[str, Any], session_id: int, status_uuid: UUID) -
         session_id: ID сессии пользователя
         status_uuid: UUID статуса посылки
     """
-    package = PackageIn(**data)
-    get_event_loop().run_until_complete(_task(package, session_id, status_uuid))
+    get_event_loop().run_until_complete(_task(data, session_id, status_uuid))
 
 
-async def _task(data: PackageIn, session_id: int, status_uuid: UUID) -> None:
+async def _task(data: dict[str, Any], session_id: int, status_uuid: UUID) -> None:
     """
     Пытается зарегистрировать посылку и обновляет статус в зависимости от успеха
     """
@@ -47,7 +46,8 @@ async def _task(data: PackageIn, session_id: int, status_uuid: UUID) -> None:
     )
     cache = PackageStatusCache.default()
     try:
-        status['id'] = await _register_package(data, session_id)
+        package = PackageIn(**data)
+        status['id'] = await _register_package(package, session_id)
     except:
         status['error'] = True
         await cache.set_status(session_id, status_uuid, status)
