@@ -42,7 +42,7 @@ async def package_create(
 @router.get(
     path='/status/{status_uuid}/',
     response_model=PackageStatusOut,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     summary='Получение статуса посылки',
     description='Выдаёт статус посылки - завершилась ли регистрация, или нет. Произошла ли ошибка во время регистрации',
     responses=generate_custom_error_responses(
