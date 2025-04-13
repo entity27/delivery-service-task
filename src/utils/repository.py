@@ -1,8 +1,8 @@
 from collections.abc import Sequence
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import BinaryExpression, exists, select
+from sqlalchemy import ColumnElement, exists, select
 from sqlalchemy.sql.base import ExecutableOption
 
 from src.utils.dependencies import AsyncSessionDep
@@ -27,7 +27,7 @@ class BaseRepository(Generic[ModelT]):
         self,
         offset: int = 0,
         limit: int = 100,
-        expression: BinaryExpression[ModelT] | None = None,
+        expression: ColumnElement[Any] | None = None,
         ignore_pagination: bool = False,
         *options: ExecutableOption,
     ) -> Sequence[ModelT]:
@@ -57,7 +57,7 @@ class BaseRepository(Generic[ModelT]):
         return results.scalars().all()
 
     async def get(
-        self, item_id: int, expression: BinaryExpression[ModelT] | None = None
+        self, item_id: int, expression: ColumnElement[Any] | None = None
     ) -> ModelT | None:
         """
         Возвращает объект, если существует
