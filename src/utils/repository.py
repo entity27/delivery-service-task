@@ -28,6 +28,7 @@ class BaseRepository(Generic[ModelT]):
         offset: int = 0,
         limit: int = 100,
         expression: BinaryExpression[ModelT] | None = None,
+        ignore_pagination: bool = False,
         *options: ExecutableOption,
     ) -> Sequence[ModelT]:
         """
@@ -37,14 +38,21 @@ class BaseRepository(Generic[ModelT]):
             offset: Пропуск элементов
             limit: Лимит элементов
             expression: Дополнительные условия
+            ignore_pagination: Если True - не применяет offset и limit к запросу
             *options: Дополнительные опции
         """
         stm = select(self.model)
+
         if expression is not None:
             stm = stm.where(expression)
-        stm = stm.offset(offset).limit(limit).order_by(self.model.id.desc())
+        if ignore_pagination is False:
+            stm = stm.offset(offset).limit(limit)
+
+        stm = stm.order_by(self.model.id.desc())
+
         if options:
             stm = stm.options(*options)
+
         results = await self._session.execute(stm)
         return results.scalars().all()
 
