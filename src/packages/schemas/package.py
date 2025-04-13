@@ -35,7 +35,7 @@ class PackageFilterOptions(BaseModel):
     Фильтры для списка посылок
     """
 
-    package_type: int | None = Field(gt=0, default=None)
+    package_type: int | None = Field(gt=0, default=None, alias='type')
     has_cost: bool | None = Field(default=None)
 
 
