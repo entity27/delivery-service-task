@@ -1,6 +1,7 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Path, status
 
 from src.packages.cache.package_status import PackageStatusDict
 from src.packages.exceptions.package import PackageTypeNotExistsError
@@ -8,15 +9,32 @@ from src.packages.exceptions.package_status import (
     PackageStatusDecodeError,
     PackageStatusNotFoundError,
 )
-from src.packages.schemas.package import PackageIn
+from src.packages.models import Package
+from src.packages.schemas.package import PackageIn, PackageOut
 from src.packages.schemas.package_status import PackageStatusOut, PackageStatusUUIDOut
 from src.packages.services.package import PackageServiceDep
 from src.sessions.dependencies.cookie import SessionCookieDep
 from src.sessions.dependencies.session import SessionDep
 from src.sessions.exceptions.cookie import SessionCookieRequiredError
-from src.utils.exceptions import generate_custom_error_responses
+from src.utils.exceptions import Http404, generate_custom_error_responses
 
 router = APIRouter(tags=['Посылки'])
+
+
+@router.get(
+    path='/{package_id}/',
+    response_model=PackageOut,
+    status_code=status.HTTP_200_OK,
+    summary='Детальное получение объекта посылки',
+    description='Получает детальку посылки по ID',
+    responses=generate_custom_error_responses([Http404]),
+)
+async def package_get(
+    package_id: Annotated[int, Path(gt=0)],
+    session: SessionDep,
+    service: PackageServiceDep,
+) -> Package:
+    return await service.get_package(package_id, session.id)
 
 
 @router.post(
