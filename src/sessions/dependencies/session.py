@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.sessions.dependencies.cookie import SessionCookieDep
-from src.sessions.exceptions.session import SessionInvalidError
 from src.sessions.models import Session
 from src.sessions.repositories.session import SessionRepositoryDep
+from src.utils.exceptions import Http404
 
 
 async def get_session(
@@ -16,7 +16,7 @@ async def get_session(
     """
     session = await session_repo.get_by_token(token)
     if session is None:
-        raise SessionInvalidError
+        raise Http404
     return session
 
 
