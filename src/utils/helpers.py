@@ -2,7 +2,7 @@ import pkgutil
 
 
 def autoimport_models(
-    ignore: tuple[str, ...] = ('config', 'backgrounds', 'utils'),
+    ignore: tuple[str, ...] = ('config', 'backgrounds', 'utils', 'external'),
     base: str | None = 'src',
 ) -> None:
     """

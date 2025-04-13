@@ -8,6 +8,13 @@ class CustomHTTPError(HTTPException):
     detail: str = NotImplemented
 
     def __init__(self, **format_kwargs: str) -> None:
+        """
+        Шаблон для реализации HTTP ошибок со стандартным ответом
+
+        Args:
+            **format_kwargs: Набор аргументов для форматирования
+            (в случае, если detail содержит placeholder'ы)
+        """
         if format_kwargs:
             self.detail = self.detail.format(**format_kwargs)
         super().__init__(status_code=self.status_code, detail=self.detail)

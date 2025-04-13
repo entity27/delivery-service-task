@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.sessions.utils.session import generate_session_token
+from src.sessions.constraints.session import TOKEN_SIZE
 from src.utils.models import IDModel
 
 if TYPE_CHECKING:
@@ -20,7 +20,5 @@ class Session(IDModel):
 
     __tablename__ = 'sessions'
 
-    token: Mapped[str] = mapped_column(
-        String(32), nullable=False, unique=True, default=generate_session_token
-    )
+    token: Mapped[str] = mapped_column(String(TOKEN_SIZE), nullable=False, unique=True)
     packages: Mapped['Package'] = relationship(back_populates='session')

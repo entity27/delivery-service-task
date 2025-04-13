@@ -8,17 +8,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.config.connections import engine_async, redis_pool
 
 
-async def get_session_async() -> AsyncGenerator[AsyncSession, None]:
+def create_async_session() -> AsyncSession:
     """
-    Возвращает асинхронную БД сессию
+    Создаёт асинхронную БД сессию
 
-    otes:
+    Notes:
         expire_on_commit=False, в противном случае,
         если мы не будет refresh'ить объект после коммита,
         то при передаче в pydantic или же явном обращении к аттрибутам
         мы словим ошибку, связанную с тредами greenlet'ов
     """
-    async with AsyncSession(engine_async, expire_on_commit=False) as session:
+    return AsyncSession(engine_async, expire_on_commit=False)
+
+
+async def get_session_async() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Возвращает асинхронную БД сессию
+    """
+    async with create_async_session() as session:
         yield session
 
 
