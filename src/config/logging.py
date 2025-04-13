@@ -27,6 +27,7 @@ if settings.DEBUG:
     _configuration['loggers']['sqlalchemy.engine'] = {  # type: ignore[index]
         'handlers': ['default'],
         'level': 'INFO',
+        'propagate': False,  # избегаем дублирования записей
     }
 
 logging.config.dictConfig(_configuration)
