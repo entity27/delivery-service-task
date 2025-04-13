@@ -1,13 +1,15 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
 from src.backgrounds.tasks import register_package
-from src.packages.cache.package_status import PackageStatusCacheDep
+from src.packages.cache.package_status import PackageStatusCacheDep, PackageStatusDict
 from src.packages.exceptions.package import PackageTypeNotExistsError
 from src.packages.repositories.package_type import PackageTypeRepositoryDep
 from src.packages.schemas.package import PackageIn
 from src.packages.schemas.package_status import PackageStatusUUIDOut
+from src.sessions.models import Session
 from src.sessions.repositories.session import SessionRepositoryDep
 from src.utils.database import atomic
 from src.utils.dependencies import AsyncSessionDep
@@ -50,6 +52,12 @@ class PackageService:
         )
 
         return PackageStatusUUIDOut(uuid=status_uuid)
+
+    async def get_status(
+        self, status_uuid: UUID, session: Session
+    ) -> PackageStatusDict:
+        status = await self._cache.get_status(session.id, status_uuid)
+        return status
 
 
 PackageServiceDep = Annotated[PackageService, Depends()]
