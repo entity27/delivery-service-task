@@ -21,5 +21,5 @@ CMD [ \
     "-l", \
     "INFO", \
     "--queues", \
-    "some_task" \
+    "register_package" \
 ]

@@ -2,7 +2,14 @@ import pkgutil
 
 
 def autoimport_models(
-    ignore: tuple[str, ...] = ('config', 'backgrounds', 'utils'),
+    ignore: tuple[str, ...] = (
+        'config',
+        'backgrounds',
+        'utils',
+        'external',
+        'selectors',
+    ),
+    base: str | None = 'src',
 ) -> None:
     """
     Ищем внутри доменов модели и импортируем их, чтобы alembic их обнаружил из метадаты
@@ -12,5 +19,10 @@ def autoimport_models(
         if module.name in to_ignore:
             continue
         for submodule in pkgutil.iter_modules([f'src/{module.name}']):
-            if submodule.name == 'models':
-                __import__(f'{module.name}.{submodule.name}')
+            if submodule.name != 'models':
+                continue
+            if base is None:
+                to_import = f'{module.name}.{submodule.name}'
+            else:
+                to_import = f'{base}.{module.name}.{submodule.name}'
+            __import__(to_import)

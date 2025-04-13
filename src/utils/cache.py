@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Protocol, Self
 
 from redis.asyncio.client import Pipeline
 
 from src.config.settings import settings
-from src.utils.dependencies import RedisDep
+from src.utils.dependencies import RedisDep, get_redis
 
 
 class RedisCacheAttrs(Protocol):
@@ -24,7 +24,11 @@ class RedisCache(ABC):
         Инициализируем соединение с редисом
         """
         self._con = redis
-        self._prefix = settings.project_name
+        self._prefix = settings.PROJECT_NAME
+
+    @classmethod
+    def default(cls) -> Self:
+        return cls(redis=get_redis())
 
     @property
     @abstractmethod
@@ -37,7 +41,7 @@ class RedisCache(ABC):
         """
         Строит полный ключ
         """
-        return f'{self._prefix}..{self.subtype}:{key}'
+        return f'{self._prefix}..{self.subtype}..{key}'
 
     async def _save(
         self, key: str | None, data: str, expire_duration: int | None = None
@@ -48,11 +52,11 @@ class RedisCache(ABC):
         if expire_duration is None:
             expire_duration = self.cache_expire
 
-        key = f'{self._prefix}..{self.subtype}:{key}'
+        name = self._build_key(key)
         pipe: Pipeline[str]
         async with self._con.pipeline() as pipe:
-            await pipe.watch(key)
-            await pipe.set(key, data, ex=expire_duration)
+            await pipe.watch(name)
+            await pipe.set(name, data, ex=expire_duration)
 
     async def _delete(self, key: str | None) -> None:
         """

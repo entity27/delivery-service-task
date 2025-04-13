@@ -1,3 +1,3 @@
-from .some_task import some_task
+from .register_package import register_package
 
-__all__ = ('some_task',)
+__all__ = ('register_package',)
