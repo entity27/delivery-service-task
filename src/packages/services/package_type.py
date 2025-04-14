@@ -15,6 +15,9 @@ class PackageTypeService:
         self._repo = package_type_repo
 
     async def list(self) -> Sequence[PackageTypeOut]:
+        """
+        Список типов посылок в системе
+        """
         result = await self._repo.list(ignore_pagination=True)
         return [
             PackageTypeOut.model_validate(item, from_attributes=True) for item in result
