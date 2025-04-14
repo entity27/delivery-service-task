@@ -37,6 +37,9 @@ class PackageService:
     async def list_package(
         self, pagination: PaginationIn, filters: PackageFilterOptions, session_id: int
     ) -> PaginationOut[PackageOut]:
+        """
+        Возвращает страницу списка посылок
+        """
         stm = self._repo.list_query(session_id, filters.package_type, filters.has_cost)
         items = await paginate(
             stm, pagination, self._db_session, PackageOut, prefix='packages/'
@@ -44,6 +47,9 @@ class PackageService:
         return items
 
     async def get_package(self, package_id: int, session_id: int) -> Package:
+        """
+        Возвращает посылку пользователя по ID
+        """
         package = await self._repo.get(
             package_id, expression=Package.session_id == session_id
         )
@@ -79,6 +85,19 @@ class PackageService:
     async def get_status(
         self, status_uuid: UUID, session: Session
     ) -> PackageStatusDict:
+        """
+        Возвращает статус посылки по её UUID'у
+
+        Notes:
+            После регистрации посылки создаётся её статус,
+            который можно отслеживать по выданному UUID'у.
+            Поскольку регистрация происходит удалённо, по статусу
+            посылки можно отследить, прошла ли она успешно, а также
+            получить ID зарегистрированной посылки
+
+        Returns:
+            Статус посылки - регистрация ли прошла успешно + ID зарегистрированной посылки
+        """
         status = await self._cache.get_status(session.id, status_uuid)
         return status
 
