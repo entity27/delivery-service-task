@@ -43,7 +43,7 @@ uvicorn src.main:app --env-file ./envs/local.delivery.env --reload
 
 Запуск Celery:
 ```bash
-celery -A src.backgrounds worker -B -l INFO --queues some_task
+celery -A src.backgrounds worker -B -l INFO --queues register_package
 ```
 
 Хук для разработки:
